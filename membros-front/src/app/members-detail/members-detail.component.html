@@ -1,2 +1,15 @@
 <p>Member detail component</p>
 Membro carregado: {{ selected_member.name }} - {{ selected_member.surname }}
+
+<p>Selected id = {{ selected_id }}</p>
+
+
+<input type="text" [(ngModel)]="selected_member.id" readonly>
+<input type="text" [(ngModel)]="selected_member.name">
+<input type="text" [(ngModel)]="selected_member.surname">
+<input type="text" [(ngModel)]="selected_member.phone">
+
+<button (click)="update()">Update Member</button>
+<button (click)="delete()">Delete Member</button>
+
+<button (click)="newMember()">Novo</button>
