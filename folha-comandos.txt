@@ -1,0 +1,13 @@
+Angular
+    npm install -g @angular/cli
+    ng new my-dream-app
+    cd my-dream-app
+    ng serve
+    ng generate service api = cria pagina de chamada da api api.service.ts
+    ng generate component members-detail
+Django
+startproject
+migrate
+createsuperuser
+runserver
+startapp
