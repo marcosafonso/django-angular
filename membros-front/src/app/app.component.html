@@ -1,10 +1,31 @@
 <h1>Members</h1>
 
+
+<table class="alt">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Nome</th>
+      <th>Telefone</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let member of members" (click)="memberClicked(member)">
+      <td>{{ member.id }}</td>
+      <td>{{ member.name }}-{{ member.surname }}</td>
+      <td>{{ member.phone }}</td>
+    </tr>  
+
+  </tbody>
+</table>
+
+<!-- 
 <ul>
   <li *ngFor="let member of members" (click)="memberClicked(member)">
     {{ member.id }} - {{ member.name }} - {{ member.surname }}
   </li>
 </ul>
-
+-->
 
 <router-outlet></router-outlet>
