@@ -7,7 +7,11 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   baseUrl = 'http://localhost:8000/';
-  httpHeaders = new HttpHeaders({'Content-Type': 'application/json'});
+  // api token do rest framework:
+  token = 'Token c82d3a152727b058a9c793d1cfae0895ab5ade20';
+  httpHeaders = new HttpHeaders().set('Content-Type', 'application/json').set('Authorization', this.token);
+
+
   constructor(private http: HttpClient) { }
 
   getMember(id) : Observable<any> {

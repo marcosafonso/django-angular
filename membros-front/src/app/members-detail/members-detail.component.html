@@ -1,6 +1,9 @@
 <p>Member detail component</p>
 Você está editando: {{ selected_member.name }} - {{ selected_member.surname }}
 
+<span class="image left">
+    <img src="{{ selected_member.photo }}" alt="Foto de {{ selected_member.name }}">
+</span>
 
 <input type="text" [(ngModel)]="selected_member.id" readonly> <br>
 <input type="text" [(ngModel)]="selected_member.name"> <br> 

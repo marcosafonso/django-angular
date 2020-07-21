@@ -15,7 +15,7 @@ export class MembersDetailComponent implements OnInit {
     private api:ApiService,
     private router: Router,
     private appComponent: AppComponent) { }
-  selected_member = {id: '', name: '', surname: '', phone: ''};
+  selected_member = {id: '', name: '', surname: '', phone: '', photo: ''};
   selected_id ;
   ngOnInit() {
     this.route.paramMap.subscribe((param: ParamMap) => {
