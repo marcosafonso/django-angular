@@ -7,12 +7,16 @@ import { HttpClientModule} from '@angular/common/http';
 import { MembersDetailComponent } from './members-detail/members-detail.component';
 import { FormsModule } from '@angular/forms';
 import { NewMemberComponent } from './new-member/new-member.component';
+import { NewEventComponent } from './new-event/new-event.component';
+import { EventsDetailComponent } from './events-detail/events-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MembersDetailComponent,
-    NewMemberComponent
+    NewMemberComponent,
+    NewEventComponent,
+    EventsDetailComponent
   ],
   imports: [
     BrowserModule,

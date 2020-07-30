@@ -6,6 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
+  /*
+  Aqui é onde de fato, a api do rest é invocada, para acessar os dados do projeto django.
+  Aqui é chamado os métodos de obter todos os membros, obter um membro, e salvar novo membro.
+  */
   baseUrl = 'http://localhost:8000/';
   // api token do rest framework:
   token = 'Token c82d3a152727b058a9c793d1cfae0895ab5ade20';
@@ -28,6 +32,21 @@ export class ApiService {
     {headers: this.httpHeaders});
   };
 
+  getAllEvents() : Observable<any> {
+    return this.http.get(this.baseUrl + 'events/', 
+    {headers: this.httpHeaders});
+  };
+
+  getEvent(id) : Observable<any> {
+    return this.http.get(this.baseUrl + 'events/' + id + '/',
+    {headers: this.httpHeaders});
+  };
+
+  // metodos para Event:
+  saveNewEvent(member) : Observable<any> {
+    return this.http.post(this.baseUrl + 'events/', member,
+    {headers: this.httpHeaders});
+  };
 
 }
 

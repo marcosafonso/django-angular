@@ -14,8 +14,13 @@ export class AppComponent {
     {name: 'Beltrano', id: 1, surname: "Cicrano", photo: 'http://localhost:8000/members/members_profile/mario.jpg'},
   ];
 
+  events = [
+    {id: '', name: '', describe: ''}
+  ]
+
   constructor(private api:ApiService, private router: Router) {
     this.getMembers();
+    this.getEvents();
   }
   getMembers = () => {
     this.api.getAllMembers().subscribe(
@@ -31,6 +36,24 @@ export class AppComponent {
   memberClicked = (member) => {
     this.router.navigate(['member-detail', member.id]);
   };
+
+// funcoes para Event
+
+  eventClicked = (event) => {
+    this.router.navigate(['event-detail', event.id]);
+  };
+
+  getEvents = () => {
+    this.api.getAllEvents().subscribe(
+      data => {
+        this.events = data
+      },
+      error => {
+        console.log("Aconteceu um erro.");
+      }
+    );
+  };
+
 }
 
 

@@ -1,36 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { ApiService} from './api.service';
 import { AppComponent } from '../app.component';
 
 @Component({
-  selector: 'app-members-detail',
-  templateUrl: './members-detail.component.html',
-  styleUrls: ['./members-detail.component.css']
+  selector: 'app-events-detail',
+  templateUrl: './events-detail.component.html',
+  styleUrls: ['./events-detail.component.css']
 })
-export class MembersDetailComponent implements OnInit {
+export class EventsDetailComponent implements OnInit {
 
-  constructor(
+  constructor(    
     // ActivatedRoute nos dá acesso a rota ativa no momento, seus parâmetros e demais valores
     private route: ActivatedRoute, 
     private api:ApiService,
     private router: Router,
     private appComponent: AppComponent) { }
-  selected_member = {id: '', name: '', surname: '', phone: '', photo: ''};
-  selected_id ;
+
+    selected_event = {id: '', name: '', describe: ''};
+    selected_id ;
+
   ngOnInit() {
     this.route.paramMap.subscribe((param: ParamMap) => {
       let id = parseInt(param.get('id'));
       this.selected_id = id;
-      this.loadMember(id);
+      this.loadEvent(id);
     });
   }
 
-  loadMember(id){
-    this.api.getMember(id).subscribe(
+  loadEvent(id){
+    this.api.getEvent(id).subscribe(
       data => {
         console.log(data);
-        this.selected_member = data;
+        this.selected_event = data;
       },
       error => {
         console.log("Aconteceu um erro", error.message);
@@ -39,9 +41,9 @@ export class MembersDetailComponent implements OnInit {
   };
 
   update(){
-    this.api.updateMember(this.selected_member).subscribe(
+    this.api.updateEvent(this.selected_event).subscribe(
       data => {
-        this.selected_member = data;
+        this.selected_event = data;
       },
       error => {
         console.log("Aconteceu um erro", error.message);
@@ -50,16 +52,14 @@ export class MembersDetailComponent implements OnInit {
   };
 
   delete(){
-    this.api.deleteMember(this.selected_id).subscribe(
+    this.api.deleteEvent(this.selected_id).subscribe(
       data => {
         let index;
-        
-        this.appComponent.members.forEach((e, i) =>{
+        this.appComponent.events.forEach((e, i) =>{
           if(e.id == this.selected_id)
             index = i;
         });
-
-        this.appComponent.members.splice(index, 1);
+        this.appComponent.events.splice(index, 1);
       },
       error => {
         console.log("Aconteceu um erro", error.message);
@@ -67,9 +67,8 @@ export class MembersDetailComponent implements OnInit {
     )
   };
 
-  newMember(){
-    this.router.navigate(['new-member']);
+  newEvent(){
+    this.router.navigate(['new-event']);
   }
-
 
 }

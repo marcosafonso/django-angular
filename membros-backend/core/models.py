@@ -14,3 +14,11 @@ class Member(models.Model):
     def __str__(self):
         return self.name +' - '+ self.phone
 
+
+class Event(models.Model):
+    name = models.CharField(max_length=150)
+    describe = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name + ' - ' + self.describe
+

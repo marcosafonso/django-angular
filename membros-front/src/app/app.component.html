@@ -27,5 +27,30 @@
   </li>
 </ul>
 -->
+<!-- Router outlet é necessário para renderizar os componentes do router module.
+  dica: routerlink no html, ao inves de href padrao, renderizará os componentes sem refresh
+-->
+
+<br><br><br>
+
+<table class="alt">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Nome</th>
+      <th>Describe</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let event of events" (click)="eventClicked(event)">
+      <td>{{ event.id }}</td>
+      <td>{{ event.name }}</td>
+      <td>{{ event.describe }}</td>
+    </tr>
+
+  </tbody>
+</table>
+
 
 <router-outlet></router-outlet>

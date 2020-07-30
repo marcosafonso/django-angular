@@ -1,0 +1,12 @@
+<p>Detalhes do Evento</p>
+Você está editando: {{ selected_event.name }}
+
+<input type="text" [(ngModel)]="selected_event.id" readonly> <br>
+<input type="text" [(ngModel)]="selected_event.name"> <br> 
+<input type="text" [(ngModel)]="selected_event.describe"> <br>
+
+
+<button (click)="update()" class="button primary">Update Event</button>
+<button (click)="delete()" class="button primary">Delete Member</button>
+
+<button (click)="newEvent()" class="button primary">Novo</button>
