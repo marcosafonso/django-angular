@@ -12,7 +12,7 @@ export class ApiService {
   httpHeaders = new HttpHeaders().set('Content-Type', 'application/json').set('Authorization', this.token);
 
 
-
+  //HttpClient permite fazer requisicoes http na api do projeto rest
   constructor(private http: HttpClient) { }
 
   

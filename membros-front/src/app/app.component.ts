@@ -18,10 +18,27 @@ export class AppComponent {
     {id: '', name: '', describe: ''}
   ]
 
+  fulanos = [
+    {id: '', nome: '', ativo: '', data_modificacao: ''}
+  ]
+
   constructor(private api:ApiService, private router: Router) {
     this.getMembers();
     this.getEvents();
+    this.getFulanos();
   }
+
+  getFulanos = () => {
+    this.api.getAllFulanos().subscribe(
+      data => {
+        this.fulanos = data
+      },
+      error => {
+        console.log("Aconteceu um erro oh not.");
+      }
+    );
+  };
+
   getMembers = () => {
     this.api.getAllMembers().subscribe(
       data => {

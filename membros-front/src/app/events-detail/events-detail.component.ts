@@ -13,8 +13,8 @@ export class EventsDetailComponent implements OnInit {
   constructor(    
     // ActivatedRoute nos dá acesso a rota ativa no momento, seus parâmetros e demais valores
     private route: ActivatedRoute, 
-    private api:ApiService,
-    private router: Router,
+    private api:ApiService, // api service do component events-detail
+    private router: Router, 
     private appComponent: AppComponent) { }
 
     selected_event = {id: '', name: '', describe: ''};

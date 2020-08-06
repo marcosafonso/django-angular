@@ -11,11 +11,19 @@ export class ApiService {
   Aqui é chamado os métodos de obter todos os membros, obter um membro, e salvar novo membro.
   */
   baseUrl = 'http://localhost:8000/';
+  baseUrl2 = '';
+
   // api token do rest framework:
   token = 'Token c82d3a152727b058a9c793d1cfae0895ab5ade20';
   httpHeaders = new HttpHeaders().set('Content-Type', 'application/json').set('Authorization', this.token);
+  httpHeaders2 = new HttpHeaders().set('Content-Type', 'application/json');
 
   constructor(private http: HttpClient) { }
+
+  getAllFulanos() : Observable<any> {
+    return this.http.get(this.baseUrl2 + 'marca_lista_ativo/', 
+    {headers: this.httpHeaders2});
+  };
 
   getAllMembers() : Observable<any> {
     return this.http.get(this.baseUrl + 'members/', 

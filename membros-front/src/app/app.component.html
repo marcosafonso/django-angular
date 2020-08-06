@@ -52,5 +52,23 @@
   </tbody>
 </table>
 
+<br>
+<table class="alt">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Nome</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let fulano of fulanos">
+      <td>{{ fulano.id }}</td>
+      <td>{{ fulano.nome }}</td>
+    </tr>
+
+  </tbody>
+</table>
+
 
 <router-outlet></router-outlet>
