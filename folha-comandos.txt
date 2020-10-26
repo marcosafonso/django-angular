@@ -6,6 +6,7 @@ Angular
     ng generate service api = cria pagina de chamada da api api.service.ts
     ng generate component members-detail
     ng build --prod
+    ng g class app-routing.module
 
 Django
 startproject

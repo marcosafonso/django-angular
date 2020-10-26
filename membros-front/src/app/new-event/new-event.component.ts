@@ -22,6 +22,8 @@ export class NewEventComponent implements OnInit {
     this.api.saveNewEvent(this.event).subscribe(
       data => {
         this.appComponent.events.push(data);
+        this.event = {name: '', describe: ''};
+
       },
       error => {
         console.log("Aconteceu um erro", error.message);
