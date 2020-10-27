@@ -152,8 +152,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 REST_FRAMEWORK = {
+
+    # custom pagination
+    'DEFAULT_PAGINATION_CLASS': 'front.pagination.CoffePagination',
+    'PAGE_SIZE': 2,
+
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
+
+# Exemplo de view com classe de paginacao especifica:
+# class FoolanoViewSet(viewsets.ModelViewSet):
+#     pagination_class = StandardResultsSetPagination
