@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 
 class CoffePagination(pagination.PageNumberPagination):
+    page_size_query_param = 'size' # variavel de itens por pagina
 
     def get_paginated_response(self, data):
         return Response({
