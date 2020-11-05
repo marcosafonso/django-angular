@@ -163,7 +163,19 @@ REST_FRAMEWORK = {
     ]
 }
 
-
+# exemplo do django-tabelas
+# REST_FRAMEWORK = {
+#
+#
+#     'DEFAULT_PAGINATION_CLASS': 'tabelas.apps.pagination.NovaPagination',
+#     'PAGE_SIZE': 20,
+#     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'tabelas.apps.auth.NovaAuthentication'
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],
+#
+# }
 # Exemplo de view com classe de paginacao especifica:
 # class FoolanoViewSet(viewsets.ModelViewSet):
 #     pagination_class = StandardResultsSetPagination

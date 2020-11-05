@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .permissions import CafePermission
-# from rest_framework import filters
+from rest_framework import filters as rest_filters
 
 
 # teste django_filters
@@ -46,8 +46,10 @@ class EventViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated]
 
     # testar filtro de campos
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter)
     filterset_class = EventFilter
+    ordering_fields = ('name',)
+    ordering = ('-name',)
 
     def create(self, request, *args, **kwargs):
         msgs = {}
