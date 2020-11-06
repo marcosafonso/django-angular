@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render
 from .models import Member, Event
 from rest_framework import status, viewsets
@@ -15,12 +16,12 @@ from django_filters import rest_framework as filters
 
 
 class EventFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='istartswith')
-    describe = django_filters.CharFilter(lookup_expr='istartswith')
+    # name = django_filters.CharFilter(lookup_expr='istartswith')
+    # describe = django_filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
         model = Event
-        fields = ['name', 'describe']
+        fields = "__all__"
 
 
 
@@ -44,12 +45,27 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     #authentication_classes = [TokenAuthentication, SessionAuthentication]
     #permission_classes = [IsAuthenticated]
-
     # testar filtro de campos
-    filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter)
-    filterset_class = EventFilter
+    filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
+    search_fields = ['name', 'describe']
+
+    # filterset_fields = "__all__"
+    # filterset_class = EventFilter
     ordering_fields = ('name',)
     ordering = ('-name',)
+
+    # Show all of the PASSENGERS in particular WORKSPACE
+    # or all of the PASSENGERS in particular AIRLINE
+    # def get_queryset(self):
+    #     queryset = Event.objects.all()
+    #     busca = self.request.query_params.get('busca')
+    #
+    #     if busca:
+    #         print("tenho busca")
+    #         queryset = queryset.filter(Q(name__icontains=busca) | Q(describe__icontains=busca))
+    #         print(queryset)
+    #
+    #     return queryset
 
     def create(self, request, *args, **kwargs):
         msgs = {}

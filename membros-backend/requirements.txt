@@ -7,3 +7,4 @@ pytz==2020.1
 sqlparse==0.3.1
 psycopg2
 django-filter-2.4.0
+django-url-filter==0.3.15
