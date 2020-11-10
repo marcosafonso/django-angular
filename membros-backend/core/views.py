@@ -30,14 +30,19 @@ class EventFilter(django_filters.FilterSet):
 class MemberViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [CafePermission]
 
-    """Modificado para usar o serializer mais simples do Member model"""
-    def list(self, request, *args, **kwargs):
-        queryset = Member.objects.all()
-        serializer = MemberSimpleSerializer(queryset, many=True)
-        return Response(serializer.data)
+    filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
+    # metodo ninja do search fields
+    search_fields = [f.get_attname() for f in Member._meta.fields]
+
+    # authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # permission_classes = [CafePermission]
+
+    # """Modificado para usar o serializer mais simples do Member model"""
+    # def list(self, request, *args, **kwargs):
+    #     queryset = Member.objects.all()
+    #     serializer = MemberSimpleSerializer(queryset, many=True)
+    #     return Response(serializer.data)
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -47,9 +52,9 @@ class EventViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated]
     # testar filtro de campos
     filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
-    search_fields = ['name', 'describe']
+    # metodo ninja do search fields
+    search_fields = [f.get_attname() for f in Event._meta.fields]
 
-    # filterset_fields = "__all__"
     # filterset_class = EventFilter
     ordering_fields = ('name',)
     ordering = ('-name',)
@@ -67,17 +72,17 @@ class EventViewSet(viewsets.ModelViewSet):
     #
     #     return queryset
 
-    def create(self, request, *args, **kwargs):
-        msgs = {}
-        dados = []
-        for item in request.data:
-            print(item)    
-            serializer = self.get_serializer(data=item)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            msgs.update(headers)
-            print(serializer.data)
-            dados.append(serializer.data)
-
-        return Response(dados, status=status.HTTP_201_CREATED, headers=msgs)
+    # def create(self, request, *args, **kwargs):
+    #     msgs = {}
+    #     dados = []
+    #     for item in request.data:
+    #         print(item)
+    #         serializer = self.get_serializer(data=item)
+    #         serializer.is_valid(raise_exception=True)
+    #         self.perform_create(serializer)
+    #         headers = self.get_success_headers(serializer.data)
+    #         msgs.update(headers)
+    #         print(serializer.data)
+    #         dados.append(serializer.data)
+    #
+    #     return Response(dados, status=status.HTTP_201_CREATED, headers=msgs)
