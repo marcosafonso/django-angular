@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import environ
+
+
+env = environ.Env()
+environ.Env.read_env()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +31,7 @@ SECRET_KEY = '_n-usymfa%fiffc#17i7xjajoykdglqy8mysmps#xzi)1ks99m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,6 +48,9 @@ INSTALLED_APPS = [
     'core',
     'corsheaders',
     'django_filters',
+
+    # django-storages para s3
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +63,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # django-currentuser
+    'django_currentuser.middleware.ThreadLocalUserMiddleware',
 ]
 
 ROOT_URLCONF = 'front.urls'
@@ -136,7 +147,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [
@@ -179,3 +190,68 @@ REST_FRAMEWORK = {
 # Exemplo de view com classe de paginacao especifica:
 # class FoolanoViewSet(viewsets.ModelViewSet):
 #     pagination_class = StandardResultsSetPagination
+
+
+# Configuração para usar o CLOUDWATCH LOG
+from boto3.session import Session
+
+CLOUDWATCH_AWS_ID = env.str('CLOUDWATCH_AWS_ID')
+CLOUDWATCH_AWS_KEY = env.str('CLOUDWATCH_AWS_KEY')
+AWS_DEFAULT_REGION = env.str('AWS_DEFAULT_REGION')
+
+logger_boto3_session = Session(
+    aws_access_key_id=CLOUDWATCH_AWS_ID,
+    aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+    region_name=AWS_DEFAULT_REGION,
+)
+
+# LOGGING para CLOUDWATCH
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "aws": {
+            "format": "%(asctime)s [%(levelname)-8s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "watchtower": {
+            "level": "INFO",
+            "class": "watchtower.CloudWatchLogHandler",
+            # From step 2
+            "boto3_session": logger_boto3_session,
+            "log_group": "Event_Sistem_Logs",
+            # Different stream for each environment
+            "stream_name": f"logs",
+            "formatter": "aws",
+        },
+        "console": {"class": "logging.StreamHandler", "formatter": "aws",},
+    },
+    "loggers": {
+        # Use this logger to send data just to Cloudwatch
+        "watchtower": {"level": "INFO", "handlers": ["watchtower"], "propogate": False,}
+    },
+}
+
+
+# configuracao do s3 no projeto:
+
+AWS_ACCESS_KEY_ID = env.str('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env.str('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env.str('AWS_STORAGE_BUCKET_NAME')
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
+
+
+DEFAULT_FILE_STORAGE = 'front.storage_backends.MediaStorage'  # <-- here is where we reference it
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'membros-backend/static'),
+# ]
+# STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

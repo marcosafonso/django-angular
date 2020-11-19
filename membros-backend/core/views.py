@@ -1,12 +1,8 @@
-from django.db.models import Q
-from django.shortcuts import render
-from .models import Member, Event
-from rest_framework import status, viewsets
-from .serializers import MemberSerializer, MemberSimpleSerializer, EventSerializer
-from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .permissions import CafePermission
+from .models import Member, Event
+from rest_framework import status, viewsets
+from .serializers import MemberSerializer, EventSerializer
 from rest_framework import filters as rest_filters
 
 
@@ -22,7 +18,6 @@ class EventFilter(django_filters.FilterSet):
     class Meta:
         model = Event
         fields = "__all__"
-
 
 
 # Create your views here. 
@@ -45,11 +40,14 @@ class MemberViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 
+import logging
+
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    #authentication_classes = [TokenAuthentication, SessionAuthentication]
-    #permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     # testar filtro de campos
     filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
     # metodo ninja do search fields
@@ -59,30 +57,10 @@ class EventViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name',)
     ordering = ('-name',)
 
-    # Show all of the PASSENGERS in particular WORKSPACE
-    # or all of the PASSENGERS in particular AIRLINE
-    # def get_queryset(self):
-    #     queryset = Event.objects.all()
-    #     busca = self.request.query_params.get('busca')
-    #
-    #     if busca:
-    #         print("tenho busca")
-    #         queryset = queryset.filter(Q(name__icontains=busca) | Q(describe__icontains=busca))
-    #         print(queryset)
-    #
-    #     return queryset
+    # todo: parei em logger direto pro cloud
+    # teste de registrar log no cloudwatch
+    # def perform_create(self, serializer):
+    #     event = serializer.save()
+    #     # Log our new student
 
-    # def create(self, request, *args, **kwargs):
-    #     msgs = {}
-    #     dados = []
-    #     for item in request.data:
-    #         print(item)
-    #         serializer = self.get_serializer(data=item)
-    #         serializer.is_valid(raise_exception=True)
-    #         self.perform_create(serializer)
-    #         headers = self.get_success_headers(serializer.data)
-    #         msgs.update(headers)
-    #         print(serializer.data)
-    #         dados.append(serializer.data)
-    #
-    #     return Response(dados, status=status.HTTP_201_CREATED, headers=msgs)
+
