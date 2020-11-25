@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from rest_framework import routers
-from core.views import MemberViewSet, EventViewSet
+from core.views import MemberViewSet, EventViewSet, view_log_events
 from django.urls import include
 
 router = routers.DefaultRouter()
@@ -30,5 +30,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    path('ver_logs/', view_log_events, name='ver_logs')
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

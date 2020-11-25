@@ -1,5 +1,14 @@
+from datetime import date
+
+import boto3
+from django.http import HttpResponse
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.utils import json
+
+from front import settings
 from .models import Member, Event
 from rest_framework import status, viewsets
 from .serializers import MemberSerializer, EventSerializer
@@ -63,4 +72,40 @@ class EventViewSet(viewsets.ModelViewSet):
     #     event = serializer.save()
     #     # Log our new student
 
+@api_view(['GET'])
+def view_log_events(request):
+    # nome log group:
+    LOG_GROUP = 'GROUP_POKEMON'
 
+    # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
+    data_hoje = date.today()
+    data_hoje_str = data_hoje.strftime("%m/%Y")
+    LOG_STREAM = data_hoje_str
+
+    # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
+    logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
+                        aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
+
+    response = logs.filter_log_events(
+        logGroupName=LOG_GROUP,
+        logStreamNames=[
+            LOG_STREAM,
+        ],
+        # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
+        # startTime=123,
+        # endTime=123,
+        # filterPattern='string',
+        # nextToken='string',
+        # limit=123,
+        # interleaved=True | False
+    )
+
+    # for obj in response['events']:
+    #     print(obj)
+    # j = json.dumps(response)
+    print(type(response))
+
+    json_object = json.dumps(response['events'])
+
+    # todo: AssertionError .accepted_renderer not set on Response
+    return Response(json_object, content_type='application/json')

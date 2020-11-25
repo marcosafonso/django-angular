@@ -1,5 +1,7 @@
-from datetime import date
+import csv
+from datetime import date, time
 
+import boto3
 import watchtower
 from django.db import models
 import logging
@@ -30,37 +32,11 @@ def serialize(obj):
 from datetime import datetime
 
 
-def registra_log_cloudwatch(self):
-    """
-    e lá vamos nós.
-    """
-    watchtower_handler = watchtower.CloudWatchLogHandler(log_group="Cake1", boto3_session=settings.logger_boto3_session)
-
-    registro = self.__dict__
-    nome_model = self.__class__.__name__
-    # pega usuario que salvou a alteracao
-    quem = get_current_user()
-    registro['info_usuario'] = quem.username
-
-    # pega data da alteração
-    data = datetime.now()
-    registro['info_data_modificado'] = data.strftime("%d/%m/%Y, %H:%M:%S")
-
-    # nome do model
-    registro['info_tabela'] = nome_model
-
-    # remover campo desnecessário
-    del registro['_state']
-
-    print(registro)
-
-    # envia para o cloudwatch log
-    logger = logging.getLogger("watchtower")
-    logger.addHandler(watchtower_handler)
-    logger.info(registro)
-
-
-# def ler_arquivo_s3(self):
+# def registra_log_cloudwatch(self):
+#     """
+#     e lá vamos nós.
+#     """
+#     watchtower_handler = watchtower.CloudWatchLogHandler(log_group="Cake1", boto3_session=settings.logger_boto3_session)
 #
 #     registro = self.__dict__
 #     nome_model = self.__class__.__name__
@@ -78,22 +54,170 @@ def registra_log_cloudwatch(self):
 #     # remover campo desnecessário
 #     del registro['_state']
 #
+#     print(registro)
+#
+#     # envia para o cloudwatch log
+#     logger = logging.getLogger("watchtower")
+#     # logger.addHandler(watchtower_handler)
+#     logger.info(registro)
+
+
+# def ler_arquivo_s3(self):
+
+    # registro = self.__dict__
+    # nome_model = self.__class__.__name__
+    # # pega usuario que salvou a alteracao
+    # quem = get_current_user()
+    # registro['info_usuario'] = quem.username
+    #
+    # # pega data da alteração
+    # data = datetime.now()
+    # registro['info_data_modificado'] = data.strftime("%d/%m/%Y, %H:%M:%S")
+    #
+    # # nome do model
+    # registro['info_tabela'] = nome_model
+    #
+    # # remover campo desnecessário
+    # del registro['_state']
+#
 #     obj_log = LogSistema.objects.filter().first()
 #
 #     if obj_log:
-#         pass
-        # arquivo = obj_log.arquivo
-        #
-        # arquivo.open(mode="r")
-        # content = arquivo.read()
-        # # lines = arquivo.readlines()
-        #
-        # a.write(registro)
-        #
-        # obj_log.arquivo = a
-        # obj_log.save()
-        #
-        # arquivo.close()
+#         # fazer aqui
+#         arquivo = obj_log.arquivo
+#         arquivo.open(mode='a')
+#
+#         writer = csv.DictWriter(arquivo, fieldnames=['id', 'describe', 'info_usuario', 'name', 'info_tabela', 'info_data_modificado'])
+#         writer.writerow(registro)
+#
+#         obj_log.arquivo = writer
+#         obj_log.save()
+
+import time
+import json
+
+
+def monta_json_log(self):
+
+    registro = self.__dict__
+    nome_model = self.__class__.__name__
+    # pega usuario que salvou a alteracao
+    quem = get_current_user()
+    registro['info_usuario'] = quem.username
+
+    # pega data da alteração
+    data = datetime.now()
+    registro['info_data_modificado'] = data.strftime("%d/%m/%Y, %H:%M:%S")
+
+    # nome do model
+    registro['info_tabela'] = nome_model
+
+    # remover campo desnecessário
+    del registro['_state']
+
+    # converte dict em json str
+    registro_str = json.dumps(registro)
+
+    return registro_str
+
+
+def teste_cloud_log(self):
+
+    # chama funcao que formata o json com o registro alterado
+    
+    registro_str = monta_json_log(self)
+
+    # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
+    logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
+                        aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
+
+    # nome do grupo: no tabelao será um só para cada inquilino
+    LOG_GROUP = 'GROUP_POKEMON'
+
+    # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
+    data_hoje = date.today()
+    data_hoje_str = data_hoje.strftime("%m/%Y")
+    LOG_STREAM = data_hoje_str
+
+    # Checa existencia do log Group, se nao existir, cria ele
+    log_group_existe = logs.describe_log_groups(logGroupNamePrefix=LOG_GROUP)
+
+    if len(log_group_existe['logGroups']) == 0:
+        print("nao existe log group, CRIAR +++++++++++")
+        logs.create_log_group(logGroupName=LOG_GROUP)
+
+    # Checa existencia do log Stream , se nao existir, cria ele
+    log_stream_existe = logs.describe_log_streams(logGroupName=LOG_GROUP, logStreamNamePrefix=LOG_STREAM)
+
+    if len(log_stream_existe['logStreams']) == 0:
+        print("nao existe log stream, CRIAR --------")
+        logs.create_log_stream(logGroupName=LOG_GROUP, logStreamName=LOG_STREAM)
+
+    timestamp = int(round(time.time() * 1000))
+
+    try:
+        response = logs.put_log_events(
+            logGroupName=LOG_GROUP,
+            logStreamName=LOG_STREAM,
+            logEvents=[
+                {
+                    'timestamp': timestamp,
+                    'message': time.strftime('%Y-%m-%d %H:%M:%S') + registro_str
+                }
+            ]
+        )
+
+    except logs.exceptions.InvalidSequenceTokenException as exception:
+
+        sequence_token = exception.response['expectedSequenceToken']
+
+        response = logs.put_log_events(
+            logGroupName=LOG_GROUP,
+            logStreamName=LOG_STREAM,
+            sequenceToken=sequence_token,
+            logEvents=[
+                {
+                    'timestamp': timestamp,
+                    'message': time.strftime('%Y-%m-%d %H:%M:%S') + registro_str
+                }
+            ]
+        )
+
+
+def busca_log_events(self):
+
+    # nome log group:
+    LOG_GROUP = 'GROUP_POKEMON'
+
+    # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
+    data_hoje = date.today()
+    data_hoje_str = data_hoje.strftime("%m/%Y")
+    LOG_STREAM = data_hoje_str
+
+    # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
+    logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
+                        aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
+
+    # todo: teste de busca log_events:
+    response = logs.filter_log_events(
+        logGroupName=LOG_GROUP,
+        logStreamNames=[
+            LOG_STREAM,
+        ],
+        # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
+        # startTime=123,
+        # endTime=123,
+        # filterPattern='string',
+        # nextToken='string',
+        # limit=123,
+        # interleaved=True | False
+    )
+
+    # print("+++++++RESULTADO DA PESQUISA DE LOGS+++++++")
+    # print(response['events'][0]['message'])
+
+    for obj in response['events']:
+        print(obj)
 
 
 class Member(models.Model):
@@ -109,7 +233,7 @@ class Member(models.Model):
 
     def save(self, *args, **kwargs):
         super(Member, self).save(*args, **kwargs)
-        registra_log_cloudwatch(self)
+        #registra_log_cloudwatch(self)
 
 
 class Event(models.Model):
@@ -121,8 +245,10 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
-        registra_log_cloudwatch(self)
+        #registra_log_cloudwatch(self)
         # ler_arquivo_s3(self)
+        teste_cloud_log(self)
+        busca_log_events(self)
 
 
 class LogSistema(models.Model):
