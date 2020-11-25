@@ -75,7 +75,7 @@ class EventViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 def view_log_events(request):
     # nome log group:
-    LOG_GROUP = 'GROUP_POKEMON'
+    LOG_GROUP = 'GROUP_CAFE'
 
     # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
     data_hoje = date.today()
@@ -105,7 +105,8 @@ def view_log_events(request):
     # j = json.dumps(response)
     print(type(response))
 
-    json_object = json.dumps(response['events'])
+    # convert dicionario response em json str
+    json_str = json.dumps(response['events'], ensure_ascii=False)
+    json_object = json.loads(json_str)
 
-    # todo: AssertionError .accepted_renderer not set on Response
     return Response(json_object, content_type='application/json')

@@ -116,7 +116,7 @@ def monta_json_log(self):
     del registro['_state']
 
     # converte dict em json str
-    registro_str = json.dumps(registro)
+    registro_str = json.dumps(registro, ensure_ascii=False)
 
     return registro_str
 
@@ -132,7 +132,7 @@ def teste_cloud_log(self):
                         aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
 
     # nome do grupo: no tabelao será um só para cada inquilino
-    LOG_GROUP = 'GROUP_POKEMON'
+    LOG_GROUP = 'GROUP_CAFE'
 
     # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
     data_hoje = date.today()
@@ -154,7 +154,7 @@ def teste_cloud_log(self):
         logs.create_log_stream(logGroupName=LOG_GROUP, logStreamName=LOG_STREAM)
 
     timestamp = int(round(time.time() * 1000))
-
+    # time.strftime('%Y-%m-%d %H:%M:%S')
     try:
         response = logs.put_log_events(
             logGroupName=LOG_GROUP,
@@ -162,7 +162,7 @@ def teste_cloud_log(self):
             logEvents=[
                 {
                     'timestamp': timestamp,
-                    'message': time.strftime('%Y-%m-%d %H:%M:%S') + registro_str
+                    'message': registro_str
                 }
             ]
         )
@@ -178,7 +178,7 @@ def teste_cloud_log(self):
             logEvents=[
                 {
                     'timestamp': timestamp,
-                    'message': time.strftime('%Y-%m-%d %H:%M:%S') + registro_str
+                    'message': registro_str
                 }
             ]
         )
@@ -187,7 +187,7 @@ def teste_cloud_log(self):
 def busca_log_events(self):
 
     # nome log group:
-    LOG_GROUP = 'GROUP_POKEMON'
+    LOG_GROUP = 'GROUP_CAFE'
 
     # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
     data_hoje = date.today()
