@@ -209,40 +209,40 @@ def teste_cloud_log(self):
         )
 
 
-def busca_log_events(self):
-
-    # nome log group:
-    LOG_GROUP = 'GROUP_CAFE'
-
-    # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
-    data_hoje = date.today()
-    data_hoje_str = data_hoje.strftime("%m/%Y")
-    LOG_STREAM = data_hoje_str
-
-    # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
-    logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
-                        aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
-
-    # todo: teste de busca log_events:
-    response = logs.filter_log_events(
-        logGroupName=LOG_GROUP,
-        logStreamNames=[
-            LOG_STREAM,
-        ],
-        # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
-        # startTime=123,
-        # endTime=123,
-        # filterPattern='string',
-        # nextToken='string',
-        # limit=123,
-        # interleaved=True | False
-    )
-
-    # print("+++++++RESULTADO DA PESQUISA DE LOGS+++++++")
-    # print(response['events'][0]['message'])
-
-    for obj in response['events']:
-        print(obj)
+# def busca_log_events(self):
+#
+#     # nome log group:
+#     LOG_GROUP = 'GROUP_CAFE'
+#
+#     # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
+#     data_hoje = date.today()
+#     data_hoje_str = data_hoje.strftime("%m/%Y")
+#     LOG_STREAM = data_hoje_str
+#
+#     # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
+#     logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
+#                         aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
+#
+#     # todo: teste de busca log_events:
+#     response = logs.filter_log_events(
+#         logGroupName=LOG_GROUP,
+#         logStreamNames=[
+#             LOG_STREAM,
+#         ],
+#         # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
+#         # startTime=123,
+#         # endTime=123,
+#         # filterPattern='string',
+#         # nextToken='string',
+#         # limit=123,
+#         # interleaved=True | False
+#     )
+#
+#     # print("+++++++RESULTADO DA PESQUISA DE LOGS+++++++")
+#     # print(response['events'][0]['message'])
+#
+#     for obj in response['events']:
+#         print(obj)
 
 
 class Member(models.Model):

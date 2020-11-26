@@ -76,6 +76,11 @@ class EventViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def view_log_events(request):
+    """
+    Busca registros de log do CloudWatch aws.
+    :param request:
+    :return:
+    """
     # nome log group:
     LOG_GROUP = 'GROUP_CAFE'
 
