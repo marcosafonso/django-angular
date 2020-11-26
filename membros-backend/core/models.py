@@ -3,10 +3,13 @@ from datetime import date, time
 
 import boto3
 import watchtower
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 import logging
 
 # Create your models here.
+from django.db.models.fields.files import ImageFieldFile
+from django.forms import model_to_dict
 from django_currentuser.middleware import (
     get_current_user, get_current_authenticated_user
 )
@@ -97,9 +100,22 @@ import time
 import json
 
 
+class LazyEncoder(DjangoJSONEncoder):
+    """
+    Funcao que permite o json.dumps converter corretamente os dicts que possuem campos com objects ImageField, e outros
+    que forem necessários.
+    """
+    def default(self, obj):
+        if isinstance(obj, ImageFieldFile):
+            return str(obj)
+        return super().default(obj)
+
+
 def monta_json_log(self):
 
-    registro = self.__dict__
+    # registro = self.__dict__
+    registro = model_to_dict(self)
+
     nome_model = self.__class__.__name__
     # pega usuario que salvou a alteracao
     quem = get_current_user()
@@ -113,10 +129,16 @@ def monta_json_log(self):
     registro['info_tabela'] = nome_model
 
     # remover campo desnecessário
-    del registro['_state']
+    # del registro['_state']
 
     # converte dict em json str
-    registro_str = json.dumps(registro, ensure_ascii=False)
+    # todo: erro com imagefield not serializable
+    registro_str = ''
+    try:
+        registro_str = json.dumps(registro, ensure_ascii=False, cls=LazyEncoder)
+
+    except Exception as e:
+        pass
 
     return registro_str
 
@@ -156,6 +178,9 @@ def teste_cloud_log(self):
     timestamp = int(round(time.time() * 1000))
     # time.strftime('%Y-%m-%d %H:%M:%S')
     try:
+        print("o que TENEMOS aqui?")
+        print(registro_str)
+
         response = logs.put_log_events(
             logGroupName=LOG_GROUP,
             logStreamName=LOG_STREAM,
@@ -227,13 +252,14 @@ class Member(models.Model):
     email = models.EmailField()
     address = models.CharField(max_length=200)
     photo = models.ImageField(upload_to='members_profile', blank=True, null=True)
+    data_modificacao = models.DateTimeField( blank=True, null=True)
 
     def __str__(self):
         return self.name + ' - ' + self.phone
 
     def save(self, *args, **kwargs):
         super(Member, self).save(*args, **kwargs)
-        #registra_log_cloudwatch(self)
+        teste_cloud_log(self)
 
 
 class Event(models.Model):
@@ -245,10 +271,10 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
-        #registra_log_cloudwatch(self)
+        # registra_log_cloudwatch(self)
         # ler_arquivo_s3(self)
         teste_cloud_log(self)
-        busca_log_events(self)
+        # busca_log_events(self)
 
 
 class LogSistema(models.Model):

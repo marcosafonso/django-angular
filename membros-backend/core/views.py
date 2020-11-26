@@ -11,7 +11,7 @@ from rest_framework.utils import json
 from front import settings
 from .models import Member, Event
 from rest_framework import status, viewsets
-from .serializers import MemberSerializer, EventSerializer
+from .serializers import MemberSerializer, EventSerializer, MemberSimpleSerializer
 from rest_framework import filters as rest_filters
 
 
@@ -34,7 +34,8 @@ class EventFilter(django_filters.FilterSet):
 class MemberViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
-
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
     # metodo ninja do search fields
     search_fields = [f.get_attname() for f in Member._meta.fields]
@@ -110,7 +111,10 @@ def view_log_events(request):
     #     print(obj)
     # j = json.dumps(response)
 
+    # pega valor da qtd de logs retornados
     qtd_logs = len(response['events'])
+
+    # na response, a chave events contém os logs
     events = response['events']
 
     cont = 0

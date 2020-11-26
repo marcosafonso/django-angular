@@ -3,9 +3,10 @@ from .models import Member, Event
 
 
 class MemberSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Member
-        fields = ['id', 'name', 'surname', 'phone', 'photo']
+        fields = ['id', 'name', 'surname', 'phone', 'photo', 'data_modificacao']
 
 
 class MemberSimpleSerializer(serializers.ModelSerializer):
