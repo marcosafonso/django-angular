@@ -72,6 +72,7 @@ class EventViewSet(viewsets.ModelViewSet):
     #     event = serializer.save()
     #     # Log our new student
 
+
 @api_view(['GET'])
 def view_log_events(request):
     # nome log group:
@@ -86,27 +87,45 @@ def view_log_events(request):
     logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
                         aws_secret_access_key=settings.CLOUDWATCH_AWS_KEY)
 
-    response = logs.filter_log_events(
-        logGroupName=LOG_GROUP,
-        logStreamNames=[
-            LOG_STREAM,
-        ],
-        # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
-        # startTime=123,
-        # endTime=123,
-        # filterPattern='string',
-        # nextToken='string',
-        # limit=123,
-        # interleaved=True | False
-    )
+    try:
+        response = logs.filter_log_events(
+            logGroupName=LOG_GROUP,
+            logStreamNames=[
+                LOG_STREAM,
+            ],
+            # logStreamNamePrefix='string', # prefix pesquisa por logstream que comecam com a str informada
+            # startTime=123,
+            # endTime=123,
+            # filterPattern='string',
+            # nextToken='string',
+            # limit=123,
+            # interleaved=True | False
+        )
+
+    except logs.exceptions.ResourceNotFoundException:
+        msg = {'Retorno': 'Não há registros de log disponíveis para consulta.'}
+        return Response(msg, content_type='application/json')
 
     # for obj in response['events']:
     #     print(obj)
     # j = json.dumps(response)
-    print(type(response))
 
-    # convert dicionario response em json str
-    json_str = json.dumps(response['events'], ensure_ascii=False)
-    json_object = json.loads(json_str)
+    qtd_logs = len(response['events'])
+    events = response['events']
 
-    return Response(json_object, content_type='application/json')
+    cont = 0
+    list_logs = []
+    # Iterar sobre os logs pegando apenas a informacao de alteracao, e adicionando na list_logs
+    while cont < qtd_logs:
+        # pegar só o campo message de cada log retornado, pois message contem a fotografia da alteracao do model
+        str_message = events[cont]['message']
+        # converte str message em python obj
+        object_message = json.loads(str_message)
+
+        list_logs.append(object_message)
+        cont = cont + 1
+
+    # json_str = json.dumps(response['events'], ensure_ascii=False)
+    # json_object = json.loads(json_str)
+
+    return Response(list_logs, content_type='application/json')
