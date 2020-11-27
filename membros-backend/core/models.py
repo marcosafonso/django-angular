@@ -8,7 +8,7 @@ from django.db import models
 import logging
 
 # Create your models here.
-from django.db.models.fields.files import ImageFieldFile
+from django.db.models.fields.files import ImageFieldFile, FileField
 from django.forms import model_to_dict
 from django_currentuser.middleware import (
     get_current_user, get_current_authenticated_user
@@ -104,9 +104,12 @@ class LazyEncoder(DjangoJSONEncoder):
     """
     Funcao que permite o json.dumps converter corretamente os dicts que possuem campos com objects ImageField, e outros
     que forem necessários.
+    # todo: objetos fk poderiam dar erro? lembrar de testar
     """
     def default(self, obj):
         if isinstance(obj, ImageFieldFile):
+            return str(obj)
+        if isinstance(obj, FileField):
             return str(obj)
         return super().default(obj)
 
