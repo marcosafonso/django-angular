@@ -2,6 +2,7 @@ from datetime import date
 
 import boto3
 from django.http import HttpResponse
+from django.views import View
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -84,10 +85,21 @@ def view_log_events(request):
     # nome log group:
     LOG_GROUP = 'GROUP_CAFE'
 
+    try:
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        body_data = body_data['mes/ano']
+        print(body_data)
+
+    except Exception as e:
+        msg = {'Retorno': 'dados Informados não estão no formato mm/yyyy (mes/ano).'}
+        return Response(msg, content_type='application/json')
+
+
     # nome do logStream => será mes/ano, virando o mes, novo logStream será criado dentro daquele logGroup
     data_hoje = date.today()
     data_hoje_str = data_hoje.strftime("%m/%Y")
-    LOG_STREAM = data_hoje_str
+    LOG_STREAM = body_data
 
     # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
     logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
@@ -138,3 +150,17 @@ def view_log_events(request):
     # json_object = json.loads(json_str)
 
     return Response(list_logs, content_type='application/json')
+
+from .tasks import ola_mundo_task
+from django.contrib import messages
+
+
+class OlaMundoView(View):
+
+    def get(self, request):
+
+        ola_mundo_task.delay()
+
+        messages.success(request, 'Olá Mundo realizado com sucesso!')
+
+        return HttpResponse("Não há vagas!")

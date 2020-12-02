@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from rest_framework import routers
-from core.views import MemberViewSet, EventViewSet, view_log_events
+from core.views import MemberViewSet, EventViewSet, view_log_events, OlaMundoView
 from django.urls import include
 
 router = routers.DefaultRouter()
@@ -32,6 +32,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    path('ver_logs/', view_log_events, name='ver_logs')
+    path('ver_logs/', view_log_events, name='ver_logs'),
+
+    path('ola_mundo/', OlaMundoView.as_view(), name='ola_mundo'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
