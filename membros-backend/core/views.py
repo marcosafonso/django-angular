@@ -57,8 +57,8 @@ import logging
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
     # testar filtro de campos
     filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
     # metodo ninja do search fields
@@ -92,7 +92,7 @@ def view_log_events(request):
         print(body_data)
 
     except Exception as e:
-        msg = {'Retorno': 'dados Informados não estão no formato mm/yyyy (mes/ano).'}
+        msg = {'Retorno': 'dados Informados não estão no formato { "mes/ano": "mm/yyyy" } (mes/ano).'}
         return Response(msg, content_type='application/json')
 
 

@@ -36,3 +36,15 @@ def ola_mundo_task():
         cont = cont + 1
 
     logger.info('Finishing task..')
+
+
+# @app.task(name="cria_log_task")
+# def cria_log_task():
+#     logger.info('Fazendo teste de registra no cloudwatch..')
+#
+#     cont = 0
+#     while cont < 20:
+#         print("conta: ", cont)
+#         cont = cont + 1
+#
+#     logger.info('Finishing task..')
