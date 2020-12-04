@@ -135,7 +135,6 @@ def monta_json_log(self):
     # del registro['_state']
 
     # converte dict em json str
-    # todo: erro com imagefield not serializable
     registro_str = ''
     try:
         registro_str = json.dumps(registro, ensure_ascii=False, cls=LazyEncoder)
@@ -151,6 +150,8 @@ def teste_cloud_log(self):
     # chama funcao que formata o json com o registro alterado
     
     registro_str = monta_json_log(self)
+
+    # Todo: montar uma funcao celery para chamar a api do cloudwatch logs aqui:
 
     # instancia o cliente boto3 que acessa o servico cloudwatch-logs com as credenciais de um user com permissao
     logs = boto3.client('logs', region_name=settings.AWS_DEFAULT_REGION, aws_access_key_id=settings.CLOUDWATCH_AWS_ID,
