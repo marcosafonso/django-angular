@@ -3,6 +3,7 @@ from datetime import date, time
 
 import boto3
 import watchtower
+from celery.utils.log import get_task_logger
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 import logging
@@ -145,6 +146,11 @@ def monta_json_log(self):
     return registro_str
 
 
+from front.celery import app
+logger = get_task_logger(__name__)
+
+
+@app.task()
 def teste_cloud_log(self):
 
     # chama funcao que formata o json com o registro alterado
@@ -277,7 +283,9 @@ class Event(models.Model):
         super(Event, self).save(*args, **kwargs)
         # registra_log_cloudwatch(self)
         # ler_arquivo_s3(self)
-        teste_cloud_log(self)
+        print("save do event=======================")
+        print(type(self))
+        #teste_cloud_log(self.__class__)
         # busca_log_events(self)
 
 
