@@ -4,7 +4,8 @@ from django.dispatch import receiver
 
 from core.models import Event
 from cria_log.funcoes import registra_log_event, registra_log_event_pre_update
-
+from .tasks import teste_cloud_log
+from .models import Event
 
 # @receiver(post_save, sender=Event)
 # def create_event(sender, instance, created, **kwargs):
@@ -26,3 +27,19 @@ from cria_log.funcoes import registra_log_event, registra_log_event_pre_update
 #         registra_log_event_pre_update(old_event, instance)
 #         print("ja gerou old new !!")
 #
+
+
+# @receiver(post_save, sender=Event)
+# def save_events(sender, instance, **kwargs):
+#     """
+#     Event is called for every [CREATE, UPDATE] on EVENTS table
+#     :param sender:
+#     :param instance: Instance of the EVENTS model
+#     :param kwargs:
+#     :return:
+#     """
+#     print("=======Churrasco?")
+#
+#     # TODO: nao funciona, pq nao funciona????
+#     teste_cloud_log.delay(obj=instance)
+#     print("=======Mister cook?")
