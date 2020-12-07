@@ -286,3 +286,4 @@ class LogSistema(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
+# EU TO NA BRANCH ASSINCRONA++=========================================================================================
