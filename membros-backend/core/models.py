@@ -3,6 +3,7 @@ from datetime import date, time
 
 import boto3
 import watchtower
+from celery.utils.log import get_task_logger
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 import logging
@@ -99,11 +100,8 @@ from datetime import datetime
 import time
 import json
 
-
-
-
-
-
+from front.celery import app
+logger = get_task_logger(__name__)
 
 # def busca_log_events(self):
 #
@@ -150,6 +148,19 @@ class Member(models.Model):
     photo = models.ImageField(upload_to='members_profile', blank=True, null=True)
     data_modificacao = models.DateTimeField( blank=True, null=True)
 
+    def hello_member(self):
+        if self.name:
+            return "Welcome " + self.name
+
+    @staticmethod
+    def soma_numeros(x, y):
+        return x + y
+
+    @staticmethod
+    def calcula_porcentagem_de_valor(valor_parcial, valor_total):
+        re = (valor_parcial / valor_total) * 100
+        return re
+
     def __str__(self):
         return self.name + ' - ' + self.phone
 
@@ -167,11 +178,14 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
+        x = get_current_user()
+        print(x)
+        print("lorem ipsum!?!?!?!")
         # registra_log_cloudwatch(self)
         # ler_arquivo_s3(self)
-        # print("=======Churrasco?")
-        teste_cloud_log(self)
-        # print("=======Mister cook?")
+        print("save do event=======================")
+        print(type(self))
+        #teste_cloud_log(self.__class__)
         # busca_log_events(self)
 
 
@@ -180,3 +194,23 @@ class LogSistema(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
+# EU TO NA BRANCH ASSINCRONA++=========================================================================================
+
+# Models case biblioteca
+class Book(models.Model):
+    nome = models.CharField(max_length=150)
+    author = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nome + ' - ' + self.author
+
+
+class Emprestimo(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.PROTECT)
+    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    data_emprestimo = models.DateField(auto_now_add=True)
+    devolvido = models.BooleanField(default=False)
+    data_devolucao = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.member.name + ' - ' + self.book.nome

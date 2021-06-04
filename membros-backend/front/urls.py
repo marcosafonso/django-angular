@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path
 
 from rest_framework import routers
-from core.views import MemberViewSet, EventViewSet, view_log_events, OlaMundoView
+from core.views import MemberViewSet, EventViewSet, view_log_events, OlaMundoView, BookViewSet, EmprestimoViewSet
 from django.urls import include
 
 router = routers.DefaultRouter()
 router.register(r'members', MemberViewSet)
 router.register(r'events', EventViewSet)
+router.register(r'books', BookViewSet)
+router.register(r'emprestimos', EmprestimoViewSet)
 
 from django.conf import settings
 from django.conf.urls.static import static

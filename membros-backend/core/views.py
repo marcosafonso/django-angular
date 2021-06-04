@@ -10,9 +10,9 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 
 from front import settings
-from .models import Member, Event
+from .models import Member, Event, Book, Emprestimo
 from rest_framework import status, viewsets
-from .serializers import MemberSerializer, EventSerializer, MemberSimpleSerializer
+from .serializers import MemberSerializer, EventSerializer, MemberSimpleSerializer, BookSerializer, EmprestimoSerializer
 from rest_framework import filters as rest_filters
 
 
@@ -22,8 +22,8 @@ from django_filters import rest_framework as filters
 
 
 class EventFilter(django_filters.FilterSet):
-    # name = django_filters.CharFilter(lookup_expr='istartswith')
-    # describe = django_filters.CharFilter(lookup_expr='istartswith')
+    name = django_filters.CharFilter(lookup_expr='istartswith', distinct=True)
+    describe = django_filters.CharFilter(lookup_expr='istartswith', distinct=True)
 
     class Meta:
         model = Event
@@ -35,8 +35,8 @@ class EventFilter(django_filters.FilterSet):
 class MemberViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
     filter_backends = (filters.DjangoFilterBackend, rest_filters.OrderingFilter, rest_filters.SearchFilter)
     # metodo ninja do search fields
     search_fields = [f.get_attname() for f in Member._meta.fields]
@@ -73,6 +73,16 @@ class EventViewSet(viewsets.ModelViewSet):
     # def perform_create(self, serializer):
     #     event = serializer.save()
     #     # Log our new student
+
+
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+
+class EmprestimoViewSet(viewsets.ModelViewSet):
+    queryset = Emprestimo.objects.all()
+    serializer_class = EmprestimoSerializer
 
 
 @api_view(['GET'])
