@@ -24,6 +24,6 @@ def update_event(sender, instance, **kwargs):
     if instance.id:
         old_event = Event.objects.get(pk=instance.id)
         print("vamos ver o antes e depois")
-        teste_cloud_log(instance)
+        # teste_cloud_log(instance)
         print("ja gerou old new !!")
 

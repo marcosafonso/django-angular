@@ -264,12 +264,25 @@ class Member(models.Model):
     photo = models.ImageField(upload_to='members_profile', blank=True, null=True)
     data_modificacao = models.DateTimeField( blank=True, null=True)
 
+    def hello_member(self):
+        if self.name:
+            return "Welcome " + self.name
+
+    @staticmethod
+    def soma_numeros(x, y):
+        return x + y
+
+    @staticmethod
+    def calcula_porcentagem_de_valor(valor_parcial, valor_total):
+        re = (valor_parcial / valor_total) * 100
+        return re
+
     def __str__(self):
         return self.name + ' - ' + self.phone
 
     def save(self, *args, **kwargs):
         super(Member, self).save(*args, **kwargs)
-        teste_cloud_log(self)
+        # teste_cloud_log(self)
 
 
 class Event(models.Model):
@@ -281,6 +294,9 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
+        x = get_current_user()
+        print(x)
+        print("lorem ipsum!?!?!?!")
         # registra_log_cloudwatch(self)
         # ler_arquivo_s3(self)
         print("save do event=======================")
@@ -295,3 +311,22 @@ class LogSistema(models.Model):
 
 
 # EU TO NA BRANCH ASSINCRONA++=========================================================================================
+
+# Models case biblioteca
+class Book(models.Model):
+    nome = models.CharField(max_length=150)
+    author = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nome + ' - ' + self.author
+
+
+class Emprestimo(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.PROTECT)
+    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    data_emprestimo = models.DateField(auto_now_add=True)
+    devolvido = models.BooleanField(default=False)
+    data_devolucao = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.member.name + ' - ' + self.book.nome
