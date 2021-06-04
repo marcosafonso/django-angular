@@ -15,7 +15,7 @@ django-environ==0.4.5
 django-filter==2.4.0
 django-storages==1.10.1
 django-url-filter==0.3.15
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 enum-compat==0.0.3
 importlib-metadata==3.1.0
 jmespath==0.10.0
