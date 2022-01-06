@@ -4,7 +4,7 @@ billiard==3.6.3.0
 boto3==1.16.16
 botocore==1.19.16
 cached-property==1.5.2
-celery==5.0.2
+celery==5.2.2
 click==7.1.2
 click-didyoumean==0.0.3
 click-repl==0.1.6
